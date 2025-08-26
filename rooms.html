@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management - Furniture Catalog</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .room-manager {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .room-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .room-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .room-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+        
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .room-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .room-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+        }
+        
+        .room-name-input {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            padding: 8px 12px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            flex: 1;
+            background: white;
+        }
+        
+        .room-stats {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .room-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .room-actions button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-btn {
+            background: #667eea;
+            color: white;
+        }
+        
+        .save-btn {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .cancel-btn {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .room-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .add-room-section {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+        }
+        
+        .add-room-section input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .add-room-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .header-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .header-gradient h1 {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+        }
+        
+        .header-gradient p {
+            margin: 0;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="index.html">← Back to Catalog</a>
+            <a href="budget.html">Budget Dashboard</a>
+            <a href="quick-setup.html">Quick Setup</a>
+        </div>
+        
+        <div class="header-gradient">
+            <h1>🏠 Room Management</h1>
+            <p>Create, edit, and organize rooms for your furniture catalog</p>
+        </div>
+        
+        <div class="room-manager">
+            <h2>Your Rooms</h2>
+            <div id="roomList" class="room-list">
+                <!-- Rooms will be populated here -->
+            </div>
+            
+            <div class="add-room-section">
+                <input type="text" id="newRoomName" placeholder="Enter new room name (e.g., Living Room, Master Bedroom)">
+                <button class="btn btn-primary" onclick="addNewRoom()">
+                    <span style="margin-right: 5px;">➕</span> Add Room
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        let rooms = [];
+        let editingRoomId = null;
+        
+        function loadRooms() {
+            // Load furniture items to get room data
+            const stored = localStorage.getItem('furnitureItems');
+            const items = stored ? JSON.parse(stored) : [];
+            
+            // Extract unique rooms
+            const roomMap = new Map();
+            items.forEach(item => {
+                if (item.room) {
+                    if (!roomMap.has(item.room)) {
+                        roomMap.set(item.room, {
+                            name: item.room,
+                            number: item.room_number || null,
+                            itemCount: 0,
+                            totalValue: 0
+                        });
+                    }
+                    const room = roomMap.get(item.room);
+                    room.itemCount++;
+                    if (item.price && item.quantity) {
+                        const price = parseFloat(item.price.replace(/[$,]/g, '')) || 0;
+                        room.totalValue += price * (item.quantity || 1);
+                    }
+                }
+            });
+            
+            // Convert to array and sort by room number
+            rooms = Array.from(roomMap.values()).sort((a, b) => {
+                if (a.number === null && b.number === null) return a.name.localeCompare(b.name);
+                if (a.number === null) return 1;
+                if (b.number === null) return -1;
+                return a.number - b.number;
+            });
+            
+            displayRooms();
+        }
+        
+        function displayRooms() {
+            const roomList = document.getElementById('roomList');
+            
+            if (rooms.length === 0) {
+                roomList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Rooms Yet</h3>
+                        <p>Add your first room using the form below</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            roomList.innerHTML = rooms.map((room, index) => `
+                <div class="room-item" data-room="${room.name}">
+                    <div class="room-info">
+                        ${room.number ? `<div class="room-number">${room.number}</div>` : ''}
+                        ${editingRoomId === room.name ? 
+                            `<input type="text" class="room-name-input" id="edit-${index}" value="${room.name}">` :
+                            `<div class="room-name">${room.name}</div>`
+                        }
+                        <div class="room-stats">
+                            ${room.itemCount} items • $${room.totalValue.toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="room-actions">
+                        ${editingRoomId === room.name ? `
+                            <button class="save-btn" onclick="saveRoomName('${room.name}', ${index})">Save</button>
+                            <button class="cancel-btn" onclick="cancelEdit()">Cancel</button>
+                        ` : `
+                            <button class="edit-btn" onclick="editRoom('${room.name}', ${index})">Edit</button>
+                            <button class="delete-btn" onclick="deleteRoom('${room.name}')">Delete</button>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function editRoom(roomName, index) {
+            editingRoomId = roomName;
+            displayRooms();
+            // Focus on the input field
+            setTimeout(() => {
+                const input = document.getElementById(`edit-${index}`);
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+            }, 50);
+        }
+        
+        function cancelEdit() {
+            editingRoomId = null;
+            displayRooms();
+        }
+        
+        function saveRoomName(oldName, index) {
+            const input = document.getElementById(`edit-${index}`);
+            const newName = input.value.trim();
+            
+            if (!newName) {
+                showToast('Room name cannot be empty', 'error');
+                return;
+            }
+            
+            if (newName !== oldName && rooms.some(r => r.name === newName)) {
+                showToast('A room with this name already exists', 'error');
+                return;
+            }
+            
+            // Update all items with this room name
+            const stored = localStorage.getItem('furnitureItems');
+            if (stored) {
+                let items = JSON.parse(stored);
+                items = items.map(item => {
+                    if (item.room === oldName) {
+                        item.room = newName;
+                        item.date_modified = new Date().toISOString();
+                    }
+                    return item;
+                });
+                localStorage.setItem('furnitureItems', JSON.stringify(items));
+            }
+            
+            editingRoomId = null;
+            loadRooms();
+            showToast(`Room renamed from "${oldName}" to "${newName}"`, 'success');
+        }
+        
+        function deleteRoom(roomName) {
+            if (!confirm(`Are you sure you want to delete "${roomName}"?\n\nThis will remove the room assignment from all ${rooms.find(r => r.name === roomName).itemCount} items in this room.`)) {
+                return;
+            }
+            
+            // Remove room from all items
+            const stored = localStorage.getItem('furnitureItems');
+            if (stored) {
+                let items = JSON.parse(stored);
+                items = items.map(item => {
+                    if (item.room === roomName) {
+                        item.room = '';
+                        item.room_number = null;
+                        item.date_modified = new Date().toISOString();
+                    }
+                    return item;
+                });
+                localStorage.setItem('furnitureItems', JSON.stringify(items));
+            }
+            
+            loadRooms();
+            showToast(`Room "${roomName}" deleted`, 'success');
+        }
+        
+        function addNewRoom() {
+            const input = document.getElementById('newRoomName');
+            const roomName = input.value.trim();
+            
+            if (!roomName) {
+                showToast('Please enter a room name', 'error');
+                return;
+            }
+            
+            if (rooms.some(r => r.name === roomName)) {
+                showToast('A room with this name already exists', 'error');
+                return;
+            }
+            
+            // Find the next available room number
+            const usedNumbers = rooms.map(r => r.room_number).filter(n => n !== null);
+            const nextNumber = usedNumbers.length > 0 ? Math.max(...usedNumbers) + 1 : 1;
+            
+            // Add a placeholder item to create the room
+            const stored = localStorage.getItem('furnitureItems');
+            const items = stored ? JSON.parse(stored) : [];
+            
+            // Actually, just reload to show the new room is ready to use
+            rooms.push({
+                name: roomName,
+                number: nextNumber,
+                itemCount: 0,
+                totalValue: 0
+            });
+            
+            input.value = '';
+            displayRooms();
+            showToast(`Room "${roomName}" created! You can now assign items to it.`, 'success');
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize
+        loadRooms();
+        
+        // Listen for Enter key in add room input
+        document.getElementById('newRoomName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addNewRoom();
+            }
+        });
+    </script>
+</body>
+</html>

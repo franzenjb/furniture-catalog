@@ -28,7 +28,7 @@ git push                 # ALWAYS push immediately after commits to keep GitHub 
    - `app-static.js` - Client-side logic using localStorage
    - `budget.html` + `budget-app.js` - Budget dashboard
    - `quick-setup.html` - Bulk price/image entry interface
-   - `demo-data.html` - Sample data loader
+   - `rooms.html` - Room management (create, edit, delete rooms)
    - Data persistence: localStorage (`furnitureItems` key)
 
 2. **Server Version (Development)** - Full-featured with SQLite
@@ -83,7 +83,7 @@ Each furniture item contains:
 - Room number assignments for organization
 - CSV export functionality
 - Quick Setup page for bulk editing
-- Demo data loader for testing
+- Room management page for editing/deleting rooms
 
 ## GitHub Pages URL
 
