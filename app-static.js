@@ -119,33 +119,46 @@ class FurnitureCatalog {
         
         grid.className = this.currentView === 'list' ? 'furniture-grid list-view' : 'furniture-grid';
         
-        grid.innerHTML = displayItems.map(item => `
-            <div class="furniture-card ${this.currentView === 'list' ? 'list-view' : ''}" onclick="catalog.showDetail('${item.id}')">
-                ${item.image_url 
-                    ? `<img src="${item.image_url}" alt="${item.title}" class="card-image" onerror="this.onerror=null; this.outerHTML='<div class=\\'card-no-image\\'>🪑</div>'">`
-                    : '<div class="card-no-image">🪑</div>'
-                }
-                <div class="card-content">
-                    <div class="card-header">
-                        <h3 class="card-title">${this.escapeHtml(item.title)}</h3>
-                        <button class="favorite-btn ${item.favorite ? 'active' : ''}" 
-                                onclick="event.stopPropagation(); catalog.toggleFavorite('${item.id}')">
-                            ${item.favorite ? '❤️' : '🤍'}
-                        </button>
-                    </div>
-                    <div class="card-meta">
-                        ${item.price ? `<span class="card-price">${this.escapeHtml(item.price)}</span>` : ''}
-                        ${item.store ? `<span class="card-store">${this.escapeHtml(item.store)}</span>` : ''}
-                        ${item.category ? `<span class="card-category">${this.escapeHtml(item.category)}</span>` : ''}
-                    </div>
-                    ${item.notes ? `<p class="card-notes">${this.escapeHtml(item.notes)}</p>` : ''}
-                    <div class="card-actions">
-                        <button class="card-btn edit-btn" onclick="event.stopPropagation(); catalog.editItem('${item.id}')">Edit</button>
-                        <button class="card-btn delete-btn" onclick="event.stopPropagation(); catalog.deleteItem('${item.id}')">Delete</button>
+        grid.innerHTML = displayItems.map(item => {
+            // Create image container with price overlay
+            const imageHtml = item.image_url 
+                ? `<div class="card-image-container">
+                       <img src="${item.image_url}" alt="${item.title}" class="card-image" 
+                            onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'card-no-image\\'>🪑</div>${item.price ? `<span class=\\'price-overlay\\'>${this.escapeHtml(item.price)}</span>` : ''}'">
+                       ${item.price ? `<span class="price-overlay">${this.escapeHtml(item.price)}</span>` : ''}
+                       ${item.quantity > 1 ? `<span class="quantity-badge">×${item.quantity}</span>` : ''}
+                   </div>`
+                : `<div class="card-image-container">
+                       <div class="card-no-image">🪑</div>
+                       ${item.price ? `<span class="price-overlay">${this.escapeHtml(item.price)}</span>` : '<span class="price-overlay no-price">No price</span>'}
+                       ${item.quantity > 1 ? `<span class="quantity-badge">×${item.quantity}</span>` : ''}
+                   </div>`;
+            
+            return `
+                <div class="furniture-card ${this.currentView === 'list' ? 'list-view' : ''}" onclick="catalog.showDetail('${item.id}')">
+                    ${imageHtml}
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h3 class="card-title">${this.escapeHtml(item.title)}</h3>
+                            <button class="favorite-btn ${item.favorite ? 'active' : ''}" 
+                                    onclick="event.stopPropagation(); catalog.toggleFavorite('${item.id}')">
+                                ${item.favorite ? '❤️' : '🤍'}
+                            </button>
+                        </div>
+                        <div class="card-meta">
+                            ${item.store ? `<span class="card-store">${this.escapeHtml(item.store)}</span>` : ''}
+                            ${item.category ? `<span class="card-category">${this.escapeHtml(item.category)}</span>` : ''}
+                            ${item.room ? `<span class="card-category" style="background: rgba(255, 107, 107, 0.1); color: #ff6b6b;">📍 ${this.escapeHtml(item.room)}</span>` : ''}
+                        </div>
+                        ${item.notes ? `<p class="card-notes">${this.escapeHtml(item.notes)}</p>` : ''}
+                        <div class="card-actions">
+                            <button class="card-btn edit-btn" onclick="event.stopPropagation(); catalog.editItem('${item.id}')">Edit</button>
+                            <button class="card-btn delete-btn" onclick="event.stopPropagation(); catalog.deleteItem('${item.id}')">Delete</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     showDetail(id) {
@@ -367,19 +380,14 @@ class FurnitureCatalog {
             
             const bookmarksToImport = filteredBookmarks.length > 0 ? filteredBookmarks : bookmarks;
             
-            // Import bookmarks with favicon/image detection
+            // Import bookmarks  
             let imported = 0;
             for (const bookmark of bookmarksToImport) {
                 const store = new URL(bookmark.url).hostname.replace('www.', '');
                 
-                // Try to get favicon or use Google's favicon service
-                let imageUrl = bookmark.icon || `https://www.google.com/s2/favicons?domain=${store}&sz=128`;
-                
-                // For furniture sites, try to detect product images from URL patterns
-                if (bookmark.url.includes('product') || bookmark.url.includes('item')) {
-                    // These would need to be fetched manually or via proxy
-                    imageUrl = `https://www.google.com/s2/favicons?domain=${store}&sz=128`;
-                }
+                // Start with no image - will need to be added manually
+                // Since we can't fetch cross-origin images from browser
+                let imageUrl = '';
                 
                 const item = {
                     id: this.generateId(),
@@ -409,7 +417,12 @@ class FurnitureCatalog {
                 : `Imported ${imported} bookmarks`;
             
             this.showToast(message, 'success');
-            this.showToast('Tip: Visit each item\'s page and add a proper image URL for better visuals!', 'info');
+            
+            // Show helpful message about adding images
+            setTimeout(() => {
+                this.showToast('💡 Tip: Edit each item to add product image URLs from the furniture website!', 'info');
+            }, 2000);
+            
             this.loadFurniture();
         };
         
