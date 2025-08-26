@@ -325,7 +325,7 @@ class FurnitureCatalog {
         const file = e.target.files[0];
         if (!file) return;
         
-        this.showToast('Importing bookmarks...', 'success');
+        this.showToast('Analyzing bookmarks...', 'info');
         
         const reader = new FileReader();
         reader.onload = async (event) => {
@@ -352,7 +352,7 @@ class FurnitureCatalog {
                         if (a) {
                             const url = a.getAttribute('href');
                             const title = a.textContent.trim();
-                            const icon = a.getAttribute('icon'); // Chrome sometimes includes icons
+                            const icon = a.getAttribute('icon');
                             if (url && title && url.startsWith('http')) {
                                 bookmarks.push({
                                     title,
@@ -372,22 +372,35 @@ class FurnitureCatalog {
                 parseBookmarks(mainDL);
             }
             
-            // Filter for Bayview folder
+            // Filter for Bayview folder ONLY
             const targetFolder = '9 - Bayview Furnishings';
-            const filteredBookmarks = bookmarks.filter(b => 
+            const bayviewBookmarks = bookmarks.filter(b => 
                 b.folder === targetFolder || b.folder.includes('Bayview')
             );
             
-            const bookmarksToImport = filteredBookmarks.length > 0 ? filteredBookmarks : bookmarks;
+            // If no Bayview folder found, notify user
+            if (bayviewBookmarks.length === 0 && bookmarks.length > 0) {
+                this.showToast(`No "${targetFolder}" folder found. No items imported.`, 'error');
+                return;
+            }
             
-            // Import bookmarks  
+            // Check for duplicates - compare by URL (most reliable)
+            const existingUrls = new Set(this.furnitureItems.map(item => item.url.toLowerCase()));
+            const newBookmarks = [];
+            const duplicates = [];
+            
+            for (const bookmark of bayviewBookmarks) {
+                if (existingUrls.has(bookmark.url.toLowerCase())) {
+                    duplicates.push(bookmark);
+                } else {
+                    newBookmarks.push(bookmark);
+                }
+            }
+            
+            // Import only NEW bookmarks
             let imported = 0;
-            for (const bookmark of bookmarksToImport) {
+            for (const bookmark of newBookmarks) {
                 const store = new URL(bookmark.url).hostname.replace('www.', '');
-                
-                // Start with no image - will need to be added manually
-                // Since we can't fetch cross-origin images from browser
-                let imageUrl = '';
                 
                 const item = {
                     id: this.generateId(),
@@ -403,27 +416,49 @@ class FurnitureCatalog {
                     favorite: false,
                     price: '',
                     notes: '',
-                    image_url: imageUrl
+                    image_url: ''
                 };
                 
                 this.furnitureItems.push(item);
                 imported++;
             }
             
-            this.saveToStorage();
+            // Save if we imported anything
+            if (imported > 0) {
+                this.saveToStorage();
+                this.loadFurniture();
+            }
             
-            const message = filteredBookmarks.length > 0 
-                ? `Imported ${imported} items from "${targetFolder}" folder` 
-                : `Imported ${imported} bookmarks`;
+            // Show detailed import summary
+            const summaryParts = [];
+            if (imported > 0) {
+                summaryParts.push(`✅ Imported ${imported} new items`);
+            }
+            if (duplicates.length > 0) {
+                summaryParts.push(`⏭️ Skipped ${duplicates.length} duplicates`);
+            }
             
-            this.showToast(message, 'success');
+            if (summaryParts.length > 0) {
+                this.showToast(summaryParts.join(' | '), 'success');
+                
+                // Show tip for new items only
+                if (imported > 0) {
+                    setTimeout(() => {
+                        this.showToast('💡 Use Quick Setup to add prices and images to new items', 'info');
+                    }, 2500);
+                }
+            } else {
+                this.showToast('No new items to import from Bayview folder', 'info');
+            }
             
-            // Show helpful message about adding images
-            setTimeout(() => {
-                this.showToast('💡 Tip: Edit each item to add product image URLs from the furniture website!', 'info');
-            }, 2000);
-            
-            this.loadFurniture();
+            // Log details for user reference
+            console.log('Import Summary:', {
+                folder: targetFolder,
+                totalInFolder: bayviewBookmarks.length,
+                newItems: imported,
+                duplicatesSkipped: duplicates.length,
+                duplicateUrls: duplicates.map(d => d.url)
+            });
         };
         
         reader.readAsText(file);
