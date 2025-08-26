@@ -130,21 +130,37 @@ class BudgetDashboard {
         // Load saved rooms from localStorage
         const savedRooms = localStorage.getItem('furnitureRooms');
         const roomsData = savedRooms ? JSON.parse(savedRooms) : [];
-        const roomNames = roomsData.map(r => r.name);
+        console.log('Loaded rooms from localStorage:', roomsData);
         
-        // Add Unassigned option and any rooms from items not in saved rooms
+        // Sort rooms by number
+        roomsData.sort((a, b) => (a.number || 999) - (b.number || 999));
+        
+        // Create room display list with numbers
+        const roomOptions = roomsData.map(r => ({
+            value: r.name,
+            display: r.number ? `${r.number}. ${r.name}` : r.name
+        }));
+        
+        // Add any rooms from items not in saved rooms
         const itemRooms = [...new Set(budgetData.items.map(i => i.room).filter(r => r))];
         itemRooms.forEach(room => {
-            if (!roomNames.includes(room)) {
-                roomNames.push(room);
+            if (!roomsData.find(r => r.name === room)) {
+                roomOptions.push({
+                    value: room,
+                    display: room
+                });
             }
         });
         
-        if (!roomNames.includes('Unassigned')) {
-            roomNames.push('Unassigned');
+        // Add Unassigned option at the end
+        if (!roomOptions.find(r => r.value === 'Unassigned')) {
+            roomOptions.push({
+                value: 'Unassigned',
+                display: 'Unassigned'
+            });
         }
         
-        const rooms = roomNames;
+        const rooms = roomOptions;
         
         tableBody.innerHTML = budgetData.items.map(item => `
             <tr data-id="${item.id}">
@@ -177,7 +193,7 @@ class BudgetDashboard {
                 <td>
                     <select class="room-select" onchange="budget.updateRoom('${item.id}', this.value)">
                         ${rooms.map(r => 
-                            `<option value="${r}" ${r === (item.room || 'Unassigned') ? 'selected' : ''}>${r}</option>`
+                            `<option value="${r.value}" ${r.value === (item.room || 'Unassigned') ? 'selected' : ''}>${r.display}</option>`
                         ).join('')}
                     </select>
                 </td>
