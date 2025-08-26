@@ -45,6 +45,16 @@ class FurnitureCatalog {
                 this.closeDetailModal();
             }
         });
+        
+        // Listen for messages from the Chrome extension
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.action === 'updateFurniture') {
+                this.handleExtensionData(event.data.data);
+            }
+        });
+        
+        // Check for extension data on page load
+        this.checkForExtensionData();
     }
 
     setView(view) {
@@ -490,6 +500,106 @@ class FurnitureCatalog {
             "'": '&#039;'
         };
         return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Handle data from Chrome extension
+    async checkForExtensionData() {
+        // Check if we have the Chrome extension API available
+        if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+            try {
+                chrome.storage.local.get(['lastExtractedFurniture'], (result) => {
+                    if (result.lastExtractedFurniture) {
+                        this.handleExtensionData(result.lastExtractedFurniture);
+                        // Clear after processing
+                        chrome.storage.local.remove(['lastExtractedFurniture']);
+                    }
+                });
+            } catch (e) {
+                console.log('Chrome storage not available - extension not installed');
+            }
+        }
+    }
+
+    handleExtensionData(data) {
+        if (!data || !data.url) return;
+        
+        // Check if this item already exists
+        const existingIndex = this.furnitureItems.findIndex(item => 
+            item.url.toLowerCase() === data.url.toLowerCase()
+        );
+        
+        if (existingIndex >= 0) {
+            // Update existing item with extracted data
+            const existingItem = this.furnitureItems[existingIndex];
+            
+            if (data.price && !existingItem.price) {
+                existingItem.price = data.price;
+                existingItem.price_extracted = true;
+            }
+            
+            if (data.image_url && !existingItem.image_url) {
+                existingItem.image_url = data.image_url;
+                existingItem.image_extracted = true;
+            }
+            
+            existingItem.date_modified = new Date().toISOString();
+            
+            this.saveToStorage();
+            this.loadFurniture();
+            
+            this.showNotification(`✅ Updated ${data.title} with extracted price and image!`);
+        } else {
+            // Add as new item
+            const newItem = {
+                id: Date.now().toString(),
+                title: data.title || 'New Furniture Item',
+                url: data.url,
+                price: data.price || '',
+                quantity: 1,
+                room: '',
+                room_number: null,
+                image_url: data.image_url || '',
+                store: data.store || '',
+                category: '',
+                bookmark_folder: 'Chrome Extension',
+                notes: 'Added via Chrome Extension',
+                favorite: false,
+                date_added: new Date().toISOString(),
+                date_modified: new Date().toISOString(),
+                price_extracted: !!data.price,
+                image_extracted: !!data.image_url
+            };
+            
+            this.furnitureItems.push(newItem);
+            this.saveToStorage();
+            this.loadFurniture();
+            
+            this.showNotification(`✅ Added ${newItem.title} with actual price and image!`);
+        }
+    }
+
+    showNotification(message) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+            font-weight: 600;
+        `;
+        notification.innerHTML = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 }
 
