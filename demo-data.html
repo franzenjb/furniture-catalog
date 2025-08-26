@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Data Loader - Furniture Catalog</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="index.html">← Back to Catalog</a>
+        </div>
+        
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 15px; margin-bottom: 30px;">
+            <h1>🎨 Demo Data Loader</h1>
+            <p>Load sample furniture items with prices and images to see how the catalog works!</p>
+        </div>
+        
+        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <h2>Sample Furniture Sets</h2>
+            <p style="margin-bottom: 20px;">Click a button to load sample furniture with prices and images:</p>
+            
+            <div style="display: grid; gap: 15px;">
+                <button onclick="loadLivingRoom()" class="btn btn-primary" style="padding: 15px;">
+                    🛋️ Load Living Room Set (Sofa, Coffee Table, TV Stand)
+                </button>
+                
+                <button onclick="loadBedroom()" class="btn btn-primary" style="padding: 15px;">
+                    🛏️ Load Bedroom Set (Bed, Nightstand, Dresser)
+                </button>
+                
+                <button onclick="loadDining()" class="btn btn-primary" style="padding: 15px;">
+                    🍽️ Load Dining Set (Table, Chairs, Buffet)
+                </button>
+                
+                <button onclick="loadOffice()" class="btn btn-primary" style="padding: 15px;">
+                    💼 Load Office Set (Desk, Chair, Bookshelf)
+                </button>
+                
+                <button onclick="clearAll()" class="btn" style="padding: 15px; background: #ff4757; color: white;">
+                    🗑️ Clear All Items
+                </button>
+            </div>
+            
+            <div id="status" style="margin-top: 30px; padding: 20px; background: #f9f9f9; border-radius: 8px; display: none;"></div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+        
+        function loadLivingRoom() {
+            const items = [
+                {
+                    id: generateId(),
+                    title: "Modern 3-Seat Sofa - Gray Fabric",
+                    url: "https://example.com/sofa",
+                    store: "example.com",
+                    category: "Living Room",
+                    price: "$899",
+                    quantity: 1,
+                    room: "Living Room",
+                    room_number: 1,
+                    image_url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400",
+                    notes: "Comfortable modern sofa with washable cushion covers",
+                    favorite: true,
+                    date_added: new Date().toISOString(),
+                    date_modified: new Date().toISOString()
+                },
+                {
+                    id: generateId(),
+                    title: "Glass Coffee Table with Storage",
+                    url: "https://example.com/coffee-table",
+                    store: "example.com",
+                    category: "Living Room",
+                    price: "$399",
+                    quantity: 1,
+                    room: "Living Room",
+                    room_number: 1,
+                    image_url: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+                    notes: "Tempered glass top with lower shelf",
+                    favorite: false,
+                    date_added: new Date().toISOString(),
+                    date_modified: new Date().toISOString()
+                },
+                {
+                    id: generateId(),
+                    title: "TV Stand - Walnut Wood 65\"",
+                    url: "https://example.com/tv-stand",
+                    store: "example.com",
+                    category: "Living Room",
+                    price: "$549",
+                    quantity: 1,
+                    room: "Living Room",
+                    room_number: 1,
+                    image_url: "https://images.unsplash.com/photo-1571843439991-dd2b8e051966?w=400",
+                    notes: "Cable management system included",
+                    favorite: false,
+                    date_added: new Date().toISOString(),
+                    date_modified: new Date().toISOString()
+                }
+            ];
+            
+            addItems(items, "Living Room");
+        }
+        
+        function loadBedroom() {
+            const items = [
+                {
+                    id: generateId(),
+                    title: "King Size Platform Bed Frame",
+                    url: "https://example.com/bed",
+                    store: "example.com",
+                    category: "Bedroom",
+                    price: "$1,299",
+                    quantity: 1,
+                    room: "Master Bedroom",
+                    room_number: 2,
+                    image_url: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=400",
+                    notes: "Upholstered headboard with USB charging ports",
+                    favorite: true,
+                    date_added: new Date().toISOString(),
+                    date_modified: new Date().toISOString()
+                },
+                {
+                    id: generateId(),
+                    title: "Nightstand Set (2 pieces)",
+                    url: "https://example.com/nightstand",
+                    store: "example.com",
+                    category: "Bedroom",
+                    price: "$399",
+                    quantity: 2,
+                    room: "Master Bedroom",
+                    room_number: 2,
+                    image_url: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=400",
+                    notes: "Two matching nightstands with drawers",
+                    favorite: false,
+                    date_added: new Date().toISOString(),
+                    date_modified: new Date().toISOString()
+                },
+                {
+                    id: generateId(),
+                    title: "6-Drawer Dresser - White Oak",
+                    url: "https://example.com/dresser",
+                    store: "example.com",
+                    category: "Bedroom",
+                    price: "$799",
+                    quantity: 1,
+                    room: "Master Bedroom",
+                    room_number: 2,
+                    image_url: "https://images.unsplash.com/photo-1558997519-83ea9252edf8?w=400",
+                    notes: "Soft-close drawers with metal runners",
+                    favorite: false,
+                    date_added: new Date().toISOString(),
+                    date_modified: new Date().toISOString()
+                }
+            ];
+            
+            addItems(items, "Bedroom");
+        }
+        
+        function loadDining() {
+            const items = [
+                {
+                    id: generateId(),
+                    title: "Extendable Dining Table",
+                    url: "https://example.com/dining-table",
+                    store: "example.com",
+                    category: "Dining Room",
+                    price: "$1,199",
+                    quantity: 1,
+                    room: "Dining Room",
+                    room_number: 3,
+                    image_url: "https://images.unsplash.com/photo-1549497538-303791108f95?w=400",
+                    notes: "Extends from 6 to 8 seats",
+                    favorite: true,
+                    date_added: new Date().toISOString(),
+                    date_modified: new Date().toISOString()
+                },
+                {
+                    id: generateId(),
+                    title: "Upholstered Dining Chairs",
+                    url: "https://example.com/dining-chairs",
+                    store: "example.com",
+                    category: "Dining Room",
+                    price: "$179",
+                    quantity: 6,
+                    room: "Dining Room",
+                    room_number: 3,
+                    image_url: "https://images.unsplash.com/photo-1549497538-303791108f95?w=400",
+                    notes: "Set of 6 matching chairs",
+                    favorite: false,
+                    date_added: new Date().toISOString(),
+                    date_modified: new Date().toISOString()
+                }
+            ];
+            
+            addItems(items, "Dining Room");
+        }
+        
+        function loadOffice() {
+            const items = [
+                {
+                    id: generateId(),
+                    title: "Standing Desk - Electric Adjustable",
+                    url: "https://example.com/desk",
+                    store: "example.com",
+                    category: "Office",
+                    price: "$699",
+                    quantity: 1,
+                    room: "Office",
+                    room_number: 4,
+                    image_url: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=400",
+                    notes: "Memory presets for height adjustment",
+                    favorite: true,
+                    date_added: new Date().toISOString(),
+                    date_modified: new Date().toISOString()
+                },
+                {
+                    id: generateId(),
+                    title: "Ergonomic Office Chair",
+                    url: "https://example.com/office-chair",
+                    store: "example.com",
+                    category: "Office",
+                    price: "$449",
+                    quantity: 1,
+                    room: "Office",
+                    room_number: 4,
+                    image_url: "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=400",
+                    notes: "Lumbar support and adjustable armrests",
+                    favorite: false,
+                    date_added: new Date().toISOString(),
+                    date_modified: new Date().toISOString()
+                }
+            ];
+            
+            addItems(items, "Office");
+        }
+        
+        function addItems(items, setName) {
+            // Get existing items
+            let existingItems = [];
+            const stored = localStorage.getItem('furnitureItems');
+            if (stored) {
+                existingItems = JSON.parse(stored);
+            }
+            
+            // Add new items
+            existingItems.push(...items);
+            
+            // Save to localStorage
+            localStorage.setItem('furnitureItems', JSON.stringify(existingItems));
+            
+            // Show status
+            const status = document.getElementById('status');
+            status.style.display = 'block';
+            status.innerHTML = `
+                <h3>✅ ${setName} Set Loaded!</h3>
+                <p>Added ${items.length} items with prices and images.</p>
+                <p>Total items in catalog: ${existingItems.length}</p>
+                <div style="margin-top: 15px;">
+                    <a href="index.html" class="btn btn-primary">View Catalog</a>
+                    <a href="budget.html" class="btn btn-secondary" style="margin-left: 10px;">View Budget</a>
+                </div>
+            `;
+            
+            showToast(`${setName} set loaded successfully!`, 'success');
+        }
+        
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all furniture items? This cannot be undone.')) {
+                localStorage.removeItem('furnitureItems');
+                
+                const status = document.getElementById('status');
+                status.style.display = 'block';
+                status.innerHTML = `
+                    <h3>🗑️ All Items Cleared</h3>
+                    <p>Your furniture catalog is now empty.</p>
+                    <div style="margin-top: 15px;">
+                        <a href="index.html" class="btn btn-primary">Go to Catalog</a>
+                    </div>
+                `;
+                
+                showToast('All items cleared', 'success');
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
