@@ -339,11 +339,13 @@ class FurnitureCatalog {
                         if (a) {
                             const url = a.getAttribute('href');
                             const title = a.textContent.trim();
+                            const icon = a.getAttribute('icon'); // Chrome sometimes includes icons
                             if (url && title && url.startsWith('http')) {
                                 bookmarks.push({
                                     title,
                                     url,
-                                    folder: currentFolder
+                                    folder: currentFolder,
+                                    icon: icon
                                 });
                             }
                         }
@@ -365,10 +367,19 @@ class FurnitureCatalog {
             
             const bookmarksToImport = filteredBookmarks.length > 0 ? filteredBookmarks : bookmarks;
             
-            // Import bookmarks
+            // Import bookmarks with favicon/image detection
             let imported = 0;
             for (const bookmark of bookmarksToImport) {
                 const store = new URL(bookmark.url).hostname.replace('www.', '');
+                
+                // Try to get favicon or use Google's favicon service
+                let imageUrl = bookmark.icon || `https://www.google.com/s2/favicons?domain=${store}&sz=128`;
+                
+                // For furniture sites, try to detect product images from URL patterns
+                if (bookmark.url.includes('product') || bookmark.url.includes('item')) {
+                    // These would need to be fetched manually or via proxy
+                    imageUrl = `https://www.google.com/s2/favicons?domain=${store}&sz=128`;
+                }
                 
                 const item = {
                     id: this.generateId(),
@@ -380,10 +391,11 @@ class FurnitureCatalog {
                     date_added: new Date().toISOString(),
                     date_modified: new Date().toISOString(),
                     quantity: 1,
+                    room_number: null,
                     favorite: false,
                     price: '',
                     notes: '',
-                    image_url: ''
+                    image_url: imageUrl
                 };
                 
                 this.furnitureItems.push(item);
@@ -397,6 +409,7 @@ class FurnitureCatalog {
                 : `Imported ${imported} bookmarks`;
             
             this.showToast(message, 'success');
+            this.showToast('Tip: Visit each item\'s page and add a proper image URL for better visuals!', 'info');
             this.loadFurniture();
         };
         

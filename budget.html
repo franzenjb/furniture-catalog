@@ -15,7 +15,7 @@
         
         <div class="budget-header">
             <h1>🏠 Budget Dashboard</h1>
-            <p>Track your furniture budget and room assignments</p>
+            <p>Manage your furniture budget with room assignments and quantities</p>
         </div>
         
         <div class="budget-summary">
@@ -28,21 +28,59 @@
                 <div class="summary-value total-cost" id="totalCost">$0</div>
             </div>
             <div class="summary-card">
-                <h3>Rooms</h3>
+                <h3>Rooms Used</h3>
                 <div class="summary-value" id="totalRooms">0</div>
             </div>
             <div class="summary-card">
-                <h3>Average per Room</h3>
-                <div class="summary-value" id="avgPerRoom">$0</div>
+                <h3>Average per Item</h3>
+                <div class="summary-value" id="avgPerItem">$0</div>
             </div>
         </div>
-        
-        <div class="chart-container">
-            <h2>Budget by Room</h2>
-            <div id="roomChart" class="bar-chart"></div>
+
+        <div class="view-controls">
+            <button id="tableViewBtn" class="view-toggle-btn active">📊 Table View</button>
+            <button id="roomViewBtn" class="view-toggle-btn">🏠 Room View</button>
+            <button id="exportBtn" class="btn btn-secondary">📥 Export CSV</button>
         </div>
         
-        <div id="roomSections"></div>
+        <div id="tableView" class="table-container">
+            <table class="budget-table">
+                <thead>
+                    <tr>
+                        <th width="50">Image</th>
+                        <th>Item Name</th>
+                        <th width="120">Store</th>
+                        <th width="100">Price</th>
+                        <th width="80">Qty</th>
+                        <th width="150">Room</th>
+                        <th width="80">Room #</th>
+                        <th width="120">Subtotal</th>
+                        <th width="80">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Items will be inserted here -->
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="4" style="text-align: right;"><strong>TOTAL:</strong></td>
+                        <td id="footerQty"><strong>0</strong></td>
+                        <td colspan="2"></td>
+                        <td id="footerTotal"><strong>$0.00</strong></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        <div id="roomView" class="room-view" style="display: none;">
+            <div class="chart-container">
+                <h2>Budget by Room</h2>
+                <div id="roomChart" class="bar-chart"></div>
+            </div>
+            
+            <div id="roomSections"></div>
+        </div>
     </div>
     
     <div id="toast" class="toast"></div>

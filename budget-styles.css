@@ -38,6 +38,159 @@
     color: #27ae60;
 }
 
+.view-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.view-toggle-btn {
+    padding: 10px 20px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.view-toggle-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.table-container {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.budget-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.budget-table th {
+    background: #f0f0f0;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+}
+
+.budget-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+.budget-table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+.table-image {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.table-no-image {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0e0e0;
+    border-radius: 6px;
+    font-size: 20px;
+}
+
+.inline-input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.inline-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.qty-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.qty-btn:hover {
+    background: #667eea;
+    color: white;
+}
+
+.qty-display {
+    min-width: 30px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.room-select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.room-number-input {
+    width: 60px;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.delete-item-btn {
+    padding: 4px 8px;
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.delete-item-btn:hover {
+    background: #ff3838;
+}
+
+.total-row td {
+    padding: 15px 12px;
+    font-size: 18px;
+    border-top: 2px solid #333;
+    border-bottom: none;
+    background: #f9f9f9;
+}
+
 .room-section {
     background: white;
     padding: 25px;
@@ -100,43 +253,6 @@
     font-size: 32px;
 }
 
-.quantity-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.quantity-btn {
-    width: 30px;
-    height: 30px;
-    border: 2px solid #667eea;
-    background: white;
-    color: #667eea;
-    border-radius: 50%;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-.quantity-btn:hover {
-    background: #667eea;
-    color: white;
-}
-
-.quantity-value {
-    font-size: 18px;
-    font-weight: bold;
-    min-width: 30px;
-    text-align: center;
-}
-
-.room-select {
-    padding: 8px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
 .chart-container {
     background: white;
     padding: 25px;
@@ -196,6 +312,22 @@
     text-decoration: underline;
 }
 
+.store-link {
+    color: #666;
+    font-size: 12px;
+}
+
+@media (max-width: 1200px) {
+    .budget-table {
+        font-size: 14px;
+    }
+    
+    .budget-table th,
+    .budget-table td {
+        padding: 8px;
+    }
+}
+
 @media (max-width: 768px) {
     .budget-item {
         grid-template-columns: 1fr;
@@ -204,5 +336,13 @@
     
     .budget-summary {
         grid-template-columns: 1fr;
+    }
+    
+    .table-container {
+        padding: 10px;
+    }
+    
+    .view-controls {
+        flex-direction: column;
     }
 }
