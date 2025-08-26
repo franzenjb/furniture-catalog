@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furniture Catalog</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 My Furniture Catalog</h1>
+            <div class="header-actions">
+                <a href="/budget.html" class="btn btn-secondary">📊 Budget Dashboard</a>
+                <button id="addItemBtn" class="btn btn-primary">+ Add Item</button>
+                <button id="importBtn" class="btn btn-secondary">📥 Import Bookmarks</button>
+                <input type="file" id="fileInput" accept=".html" style="display: none;">
+            </div>
+        </header>
+
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="Search furniture..." class="search-input">
+            <select id="categoryFilter" class="filter-select">
+                <option value="">All Categories</option>
+            </select>
+            <label class="checkbox-label">
+                <input type="checkbox" id="favoritesOnly">
+                <span>Favorites Only</span>
+            </label>
+            <div class="view-toggle">
+                <button id="gridViewBtn" class="view-btn active">⊞ Grid</button>
+                <button id="listViewBtn" class="view-btn">☰ List</button>
+            </div>
+        </div>
+
+        <div id="furnitureGrid" class="furniture-grid"></div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Add New Item</h2>
+            <form id="furnitureForm">
+                <input type="hidden" id="itemId">
+                
+                <div class="form-group">
+                    <label for="title">Title *</label>
+                    <input type="text" id="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="url">URL *</label>
+                    <input type="url" id="url" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="text" id="price" placeholder="$0.00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="store">Store</label>
+                        <input type="text" id="store">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <input type="text" id="category" list="categoryList">
+                    <datalist id="categoryList"></datalist>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" rows="4"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content detail-modal">
+            <span class="close-detail close">&times;</span>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

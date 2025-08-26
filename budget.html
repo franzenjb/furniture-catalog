@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Dashboard - Furniture Catalog</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="budget-styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="index.html">← Back to Catalog</a>
+        </div>
+        
+        <div class="budget-header">
+            <h1>🏠 Budget Dashboard</h1>
+            <p>Track your furniture budget and room assignments</p>
+        </div>
+        
+        <div class="budget-summary">
+            <div class="summary-card">
+                <h3>Total Items</h3>
+                <div class="summary-value" id="totalItems">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Total Cost</h3>
+                <div class="summary-value total-cost" id="totalCost">$0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Rooms</h3>
+                <div class="summary-value" id="totalRooms">0</div>
+            </div>
+            <div class="summary-card">
+                <h3>Average per Room</h3>
+                <div class="summary-value" id="avgPerRoom">$0</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h2>Budget by Room</h2>
+            <div id="roomChart" class="bar-chart"></div>
+        </div>
+        
+        <div id="roomSections"></div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script src="budget-app.js"></script>
+</body>
+</html>
