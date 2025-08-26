@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Setup - Furniture Catalog</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .setup-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .setup-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .quick-entry {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .item-row {
+            display: grid;
+            grid-template-columns: 40px 2fr 120px 120px 200px 80px;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+        
+        .item-row:hover {
+            background: #f9f9f9;
+        }
+        
+        .item-thumbnail {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        .item-no-thumb {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e0e0e0;
+            border-radius: 6px;
+            font-size: 20px;
+        }
+        
+        .quick-input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        .quick-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+        
+        .save-btn {
+            padding: 8px 16px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .save-btn:hover {
+            background: #229954;
+        }
+        
+        .save-all-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        
+        .save-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .helper-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .helper-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .price-suggestions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .price-chip {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .price-chip:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .image-helper {
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="index.html">← Back to Catalog</a>
+            <a href="budget.html">📊 Budget Dashboard</a>
+        </div>
+        
+        <div class="setup-header">
+            <h1>⚡ Quick Setup</h1>
+            <p>Quickly add prices and images to your furniture items</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalItemsStat">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="itemsWithPrices">0</div>
+                <div class="stat-label">Items with Prices</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="itemsWithImages">0</div>
+                <div class="stat-label">Items with Images</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completionRate">0%</div>
+                <div class="stat-label">Completion</div>
+            </div>
+        </div>
+        
+        <div class="helper-section">
+            <div class="helper-title">💡 Quick Price Suggestions</div>
+            <div class="price-suggestions">
+                <span class="price-chip" onclick="setPriceFilter('$0-100')">Under $100</span>
+                <span class="price-chip" onclick="setPriceFilter('$100-500')">$100-500</span>
+                <span class="price-chip" onclick="setPriceFilter('$500-1000')">$500-1000</span>
+                <span class="price-chip" onclick="setPriceFilter('$1000-2000')">$1000-2000</span>
+                <span class="price-chip" onclick="setPriceFilter('$2000+')">$2000+</span>
+            </div>
+            <div class="helper-title">Common Furniture Prices (Click to Apply)</div>
+            <div class="price-suggestions">
+                <span class="price-chip" data-price="299">Dining Chair $299</span>
+                <span class="price-chip" data-price="899">Dining Table $899</span>
+                <span class="price-chip" data-price="1299">Sofa $1299</span>
+                <span class="price-chip" data-price="599">Coffee Table $599</span>
+                <span class="price-chip" data-price="799">Dresser $799</span>
+                <span class="price-chip" data-price="199">Nightstand $199</span>
+                <span class="price-chip" data-price="399">Desk Chair $399</span>
+                <span class="price-chip" data-price="1599">Bed Frame $1599</span>
+            </div>
+        </div>
+        
+        <div class="image-helper">
+            <strong>🖼️ How to Get Product Images:</strong><br>
+            1. Visit the furniture website (click the link in your item)<br>
+            2. Right-click on the product image → "Copy Image Address"<br>
+            3. Paste the URL in the Image URL field<br>
+            4. The image will display immediately when saved!
+        </div>
+        
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterItems('all')">All Items</button>
+            <button class="filter-btn" onclick="filterItems('no-price')">Missing Prices</button>
+            <button class="filter-btn" onclick="filterItems('no-image')">Missing Images</button>
+            <button class="filter-btn" onclick="filterItems('complete')">Complete</button>
+        </div>
+        
+        <div class="quick-entry">
+            <h2>Quick Entry Mode</h2>
+            <div id="itemsList"></div>
+            <button class="save-all-btn" onclick="saveAllChanges()">💾 Save All Changes</button>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        let furnitureItems = [];
+        let unsavedChanges = {};
+        let currentFilter = 'all';
+        let selectedPriceChip = null;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadItems();
+            setupPriceChips();
+        });
+        
+        function loadItems() {
+            const stored = localStorage.getItem('furnitureItems');
+            if (stored) {
+                furnitureItems = JSON.parse(stored);
+            }
+            updateStats();
+            renderItems();
+        }
+        
+        function updateStats() {
+            const total = furnitureItems.length;
+            const withPrices = furnitureItems.filter(i => i.price).length;
+            const withImages = furnitureItems.filter(i => i.image_url).length;
+            const completion = total > 0 ? Math.round(((withPrices + withImages) / (total * 2)) * 100) : 0;
+            
+            document.getElementById('totalItemsStat').textContent = total;
+            document.getElementById('itemsWithPrices').textContent = withPrices;
+            document.getElementById('itemsWithImages').textContent = withImages;
+            document.getElementById('completionRate').textContent = completion + '%';
+        }
+        
+        function filterItems(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderItems();
+        }
+        
+        function renderItems() {
+            let items = [...furnitureItems];
+            
+            // Apply filter
+            if (currentFilter === 'no-price') {
+                items = items.filter(i => !i.price);
+            } else if (currentFilter === 'no-image') {
+                items = items.filter(i => !i.image_url);
+            } else if (currentFilter === 'complete') {
+                items = items.filter(i => i.price && i.image_url);
+            }
+            
+            const container = document.getElementById('itemsList');
+            
+            if (items.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No items match this filter</p>';
+                return;
+            }
+            
+            container.innerHTML = items.map(item => `
+                <div class="item-row" data-id="${item.id}">
+                    ${item.image_url 
+                        ? `<img src="${item.image_url}" class="item-thumbnail" 
+                            onerror="this.onerror=null; this.outerHTML='<div class=\\'item-no-thumb\\'>🪑</div>'">`
+                        : '<div class="item-no-thumb">🪑</div>'
+                    }
+                    <div>
+                        <strong>${escapeHtml(item.title)}</strong>
+                        ${item.store ? `<br><small style="color: #666;">${escapeHtml(item.store)}</small>` : ''}
+                    </div>
+                    <input type="text" 
+                           class="quick-input price-input" 
+                           placeholder="Price"
+                           value="${item.price || ''}"
+                           onchange="updateField('${item.id}', 'price', this.value)">
+                    <button class="price-chip" onclick="visitUrl('${item.url}')" style="margin: 0;">
+                        Visit Site →
+                    </button>
+                    <input type="text" 
+                           class="quick-input image-input" 
+                           placeholder="Image URL"
+                           value="${item.image_url || ''}"
+                           onchange="updateField('${item.id}', 'image_url', this.value)">
+                    <button class="save-btn" onclick="saveItem('${item.id}')">Save</button>
+                </div>
+            `).join('');
+        }
+        
+        function setupPriceChips() {
+            document.querySelectorAll('.price-chip[data-price]').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const price = '$' + this.dataset.price;
+                    if (selectedPriceChip) {
+                        selectedPriceChip.style.background = 'white';
+                        selectedPriceChip.style.color = 'black';
+                    }
+                    this.style.background = '#667eea';
+                    this.style.color = 'white';
+                    selectedPriceChip = this;
+                    
+                    // Apply to selected or all visible items without prices
+                    document.querySelectorAll('.item-row').forEach(row => {
+                        const priceInput = row.querySelector('.price-input');
+                        if (!priceInput.value) {
+                            priceInput.value = price;
+                            updateField(row.dataset.id, 'price', price);
+                        }
+                    });
+                });
+            });
+        }
+        
+        function updateField(id, field, value) {
+            if (!unsavedChanges[id]) {
+                unsavedChanges[id] = {};
+            }
+            unsavedChanges[id][field] = value;
+            
+            // Update thumbnail preview if image URL changed
+            if (field === 'image_url' && value) {
+                const row = document.querySelector(`[data-id="${id}"]`);
+                const thumb = row.querySelector('.item-thumbnail, .item-no-thumb');
+                if (thumb) {
+                    thumb.outerHTML = `<img src="${value}" class="item-thumbnail" 
+                        onerror="this.onerror=null; this.outerHTML='<div class=\\'item-no-thumb\\'>🪑</div>'">`;
+                }
+            }
+        }
+        
+        function saveItem(id) {
+            const item = furnitureItems.find(i => i.id === id);
+            if (item && unsavedChanges[id]) {
+                Object.assign(item, unsavedChanges[id]);
+                delete unsavedChanges[id];
+                localStorage.setItem('furnitureItems', JSON.stringify(furnitureItems));
+                showToast('Item saved!', 'success');
+                updateStats();
+            }
+        }
+        
+        function saveAllChanges() {
+            let changeCount = 0;
+            Object.keys(unsavedChanges).forEach(id => {
+                const item = furnitureItems.find(i => i.id === id);
+                if (item) {
+                    Object.assign(item, unsavedChanges[id]);
+                    changeCount++;
+                }
+            });
+            
+            if (changeCount > 0) {
+                localStorage.setItem('furnitureItems', JSON.stringify(furnitureItems));
+                unsavedChanges = {};
+                showToast(`Saved ${changeCount} items!`, 'success');
+                updateStats();
+                renderItems();
+            } else {
+                showToast('No changes to save', 'info');
+            }
+        }
+        
+        function visitUrl(url) {
+            window.open(url, '_blank');
+        }
+        
+        function setPriceFilter(range) {
+            // This would filter items by price range
+            showToast(`Filter: ${range}`, 'info');
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.toString().replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
