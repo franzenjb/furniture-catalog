@@ -223,6 +223,9 @@ class FurnitureCatalog {
         
         form.reset();
         
+        // Populate room dropdown
+        this.populateRoomDropdown();
+        
         if (item) {
             modalTitle.textContent = 'Edit Item';
             document.getElementById('itemId').value = item.id;
@@ -231,6 +234,7 @@ class FurnitureCatalog {
             document.getElementById('price').value = item.price || '';
             document.getElementById('store').value = item.store || '';
             document.getElementById('category').value = item.category || '';
+            document.getElementById('room').value = item.room || '';
             document.getElementById('image_url').value = item.image_url || '';
             document.getElementById('notes').value = item.notes || '';
         } else {
@@ -239,6 +243,37 @@ class FurnitureCatalog {
         }
         
         modal.classList.add('show');
+    }
+    
+    populateRoomDropdown() {
+        const roomSelect = document.getElementById('room');
+        
+        // Load saved rooms from localStorage
+        const savedRooms = localStorage.getItem('furnitureRooms');
+        const roomsData = savedRooms ? JSON.parse(savedRooms) : [];
+        
+        // Clear existing options except the first one
+        roomSelect.innerHTML = '<option value="">-- Select Room --</option>';
+        
+        // Add saved rooms sorted by number
+        roomsData.sort((a, b) => (a.number || 999) - (b.number || 999));
+        roomsData.forEach(room => {
+            const option = document.createElement('option');
+            option.value = room.name;
+            option.textContent = room.number ? `${room.number}. ${room.name}` : room.name;
+            roomSelect.appendChild(option);
+        });
+        
+        // Add any unique rooms from existing items not in saved rooms
+        const existingRooms = [...new Set(this.furnitureItems.map(i => i.room).filter(r => r))];
+        existingRooms.forEach(room => {
+            if (!roomsData.find(r => r.name === room)) {
+                const option = document.createElement('option');
+                option.value = room;
+                option.textContent = room;
+                roomSelect.appendChild(option);
+            }
+        });
     }
 
     closeModal() {
@@ -256,6 +291,7 @@ class FurnitureCatalog {
             price: document.getElementById('price').value,
             store: document.getElementById('store').value,
             category: document.getElementById('category').value,
+            room: document.getElementById('room').value,
             image_url: document.getElementById('image_url').value,
             notes: document.getElementById('notes').value,
             date_added: itemId ? 

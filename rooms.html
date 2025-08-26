@@ -204,40 +204,75 @@
         let editingRoomId = null;
         
         function loadRooms() {
-            // Load furniture items to get room data
+            // Load saved rooms from localStorage
+            const savedRooms = localStorage.getItem('furnitureRooms');
+            const roomsData = savedRooms ? JSON.parse(savedRooms) : [];
+            
+            // Load furniture items to get room stats
             const stored = localStorage.getItem('furnitureItems');
             const items = stored ? JSON.parse(stored) : [];
             
-            // Extract unique rooms
-            const roomMap = new Map();
+            // Create a map for room stats
+            const statsMap = new Map();
             items.forEach(item => {
                 if (item.room) {
-                    if (!roomMap.has(item.room)) {
-                        roomMap.set(item.room, {
-                            name: item.room,
-                            number: item.room_number || null,
+                    if (!statsMap.has(item.room)) {
+                        statsMap.set(item.room, {
                             itemCount: 0,
                             totalValue: 0
                         });
                     }
-                    const room = roomMap.get(item.room);
-                    room.itemCount++;
+                    const stats = statsMap.get(item.room);
+                    stats.itemCount++;
                     if (item.price && item.quantity) {
                         const price = parseFloat(item.price.replace(/[$,]/g, '')) || 0;
-                        room.totalValue += price * (item.quantity || 1);
+                        stats.totalValue += price * (item.quantity || 1);
                     }
                 }
             });
             
-            // Convert to array and sort by room number
-            rooms = Array.from(roomMap.values()).sort((a, b) => {
+            // Merge saved rooms with stats
+            rooms = roomsData.map(room => {
+                const stats = statsMap.get(room.name) || { itemCount: 0, totalValue: 0 };
+                return {
+                    ...room,
+                    itemCount: stats.itemCount,
+                    totalValue: stats.totalValue
+                };
+            });
+            
+            // Add any rooms from items that aren't in saved rooms
+            items.forEach(item => {
+                if (item.room && !rooms.find(r => r.name === item.room)) {
+                    const stats = statsMap.get(item.room) || { itemCount: 0, totalValue: 0 };
+                    rooms.push({
+                        name: item.room,
+                        number: item.room_number || rooms.length + 1,
+                        itemCount: stats.itemCount,
+                        totalValue: stats.totalValue
+                    });
+                }
+            });
+            
+            // Sort by room number
+            rooms.sort((a, b) => {
                 if (a.number === null && b.number === null) return a.name.localeCompare(b.name);
                 if (a.number === null) return 1;
                 if (b.number === null) return -1;
                 return a.number - b.number;
             });
             
+            saveRooms();
             displayRooms();
+        }
+        
+        function saveRooms() {
+            // Save just the room definitions (name and number)
+            const roomsToSave = rooms.map(r => ({
+                name: r.name,
+                number: r.number
+            }));
+            localStorage.setItem('furnitureRooms', JSON.stringify(roomsToSave));
         }
         
         function displayRooms() {
@@ -325,6 +360,11 @@
             }
             
             editingRoomId = null;
+            
+            // Update saved rooms
+            rooms = rooms.map(r => r.name === oldName ? {...r, name: newName} : r);
+            saveRooms();
+            
             loadRooms();
             showToast(`Room renamed from "${oldName}" to "${newName}"`, 'success');
         }
@@ -349,6 +389,10 @@
                 localStorage.setItem('furnitureItems', JSON.stringify(items));
             }
             
+            // Remove from saved rooms
+            rooms = rooms.filter(r => r.name !== roomName);
+            saveRooms();
+            
             loadRooms();
             showToast(`Room "${roomName}" deleted`, 'success');
         }
@@ -368,20 +412,19 @@
             }
             
             // Find the next available room number
-            const usedNumbers = rooms.map(r => r.room_number).filter(n => n !== null);
+            const usedNumbers = rooms.map(r => r.number).filter(n => n !== null);
             const nextNumber = usedNumbers.length > 0 ? Math.max(...usedNumbers) + 1 : 1;
             
-            // Add a placeholder item to create the room
-            const stored = localStorage.getItem('furnitureItems');
-            const items = stored ? JSON.parse(stored) : [];
-            
-            // Actually, just reload to show the new room is ready to use
+            // Add the new room
             rooms.push({
                 name: roomName,
                 number: nextNumber,
                 itemCount: 0,
                 totalValue: 0
             });
+            
+            // Save rooms to localStorage
+            saveRooms();
             
             input.value = '';
             displayRooms();

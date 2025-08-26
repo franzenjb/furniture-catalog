@@ -127,9 +127,24 @@ class BudgetDashboard {
             return;
         }
         
-        const rooms = ['Living Room', 'Bedroom', 'Kitchen', 'Dining Room', 'Office', 
-                       'Bathroom', 'Garage', 'Patio', 'Guest Room', 'Master Bedroom', 
-                       'Kids Room', 'Family Room', 'Basement', 'Attic', 'Unassigned'];
+        // Load saved rooms from localStorage
+        const savedRooms = localStorage.getItem('furnitureRooms');
+        const roomsData = savedRooms ? JSON.parse(savedRooms) : [];
+        const roomNames = roomsData.map(r => r.name);
+        
+        // Add Unassigned option and any rooms from items not in saved rooms
+        const itemRooms = [...new Set(budgetData.items.map(i => i.room).filter(r => r))];
+        itemRooms.forEach(room => {
+            if (!roomNames.includes(room)) {
+                roomNames.push(room);
+            }
+        });
+        
+        if (!roomNames.includes('Unassigned')) {
+            roomNames.push('Unassigned');
+        }
+        
+        const rooms = roomNames;
         
         tableBody.innerHTML = budgetData.items.map(item => `
             <tr data-id="${item.id}">
